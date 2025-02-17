@@ -1,2 +1,4 @@
 # CRAGR_v2
-CRAGR_v2 is a CRAGR pipeline that incorporates replicate handling using the irreproducible discovery rate.
+
+## License
+This project falls under an MIT license. See the included `LICENSE` file for details.
