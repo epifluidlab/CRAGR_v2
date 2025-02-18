@@ -32,11 +32,11 @@ conda activate CRAGR
 ## Workflow Diagram
 
 <p align="center">
-  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="800">
+  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="1200">
 </p>
 
 ## Citation
-Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo characterization of cell-free DNA fragmentation hotspots in plasma whole-genome sequencing. Genome Medicine [![Static Badge](https://img.shields.io/badge/DOI-10.1101/2020.07.16.201350-coral?style=flat-square)](https://doi.org/10.1101/2020.07.16.201350)
+Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo characterization of cell-free DNA fragmentation hotspots in plasma whole-genome sequencing. Genome Medicine [![Static Badge](https://img.shields.io/badge/DOI-10.1101/2020.07.16.201350-rebeccapurple?style=flat-square)](https://doi.org/10.1101/2020.07.16.201350)
 
 ## Contact
 
