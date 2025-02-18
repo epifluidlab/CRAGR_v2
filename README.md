@@ -28,6 +28,11 @@ conda activate CRAGR
 ## Quick Start
 
 ## Parameters
+For a detailed understanding of the CRAG methods and analysis stages, we encourage you to read through our documentation here: [CRAGR](https://github.com/epifluidlab/cragr).
+
+Our pipeline takes the following arguments in YAML format. An example `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
+
+
 
 ## Workflow Diagram
 
