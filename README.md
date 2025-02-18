@@ -32,7 +32,7 @@ conda activate CRAGR
 ## Workflow Diagram
 
 <p align="center">
-  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="1200">
+  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="1000">
 </p>
 
 ## Citation
