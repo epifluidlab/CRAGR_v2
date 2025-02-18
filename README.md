@@ -1,4 +1,4 @@
-# <img alt="yin-yang-two-colors" src="" height="60"> ‎ ‎ ‎CRAGR_v2
+# <img alt="yin-yang-two-colors" src="man/figures/CRAGR_v2.png" height="60"> ‎ ‎ ‎CRAGR_v2
 CRAGR_v2 (**C**ell f**R**ee dn**A** fra**G**mentation) is a pipeline for [CRAGR](https://github.com/epifluidlab/cragr) that incorporates Irreproducible Discovery Rate (IDR) to hotspot calling enable consistency between replicates or sets of samples.
 
 ## Table of Contents
@@ -31,7 +31,9 @@ conda activate CRAGR
 
 ## Workflow Diagram
 
-<img alt="CRAGR_v2 Workflow Diagram" src="" height="500">
+<p align="center">
+  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="800">
+</p>
 
 ## Citation
 Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo characterization of cell-free DNA fragmentation hotspots in plasma whole-genome sequencing. Genome Medicine [![Static Badge](https://img.shields.io/badge/DOI-10.1101/2020.07.16.201350-coral?style=flat-square)](https://doi.org/10.1101/2020.07.16.201350)
