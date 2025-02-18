@@ -27,13 +27,13 @@ conda activate CRAGR
 
 ## Quick Start
 
-1. Identify the path to the CRAGR_v2 pipeline.
+1. Identify the path to the CRAGR_v2 pipeline by running the following in R.
 ```R
 system.file("extdata/scripts/idr_pipeline", "idr_cragr.smk", package = "cragr")
 ```
 2. Specify the relevant arguments for analysis in a `params.yaml` file. Check [here](#parameters) for more information.
 
-3. Run the snakemake pipeline.
+3. Run the snakemake pipeline by running the following in bash.
 ```bash
 snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores 16
 ```
