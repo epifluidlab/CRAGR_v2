@@ -1,0 +1,18 @@
+# CRAGR_v2
+r_script: "path/to/crag.R" #  - `--r_script` (required): The path to the crag.R script.
+samples: "path/to/samples.txt" #  - `--samples` (required): A file containing the paths to the relevant fragment files. All fragment files must have a tabix index.`
+chroms: "path/to/chromosomes.txt" #  - `--chroms` (required): A file containing the chromosome names to retrieve CRAG IFS hotspots for.
+genome: "hg38" #  - `--genome` (required): The genome build to use.
+chrom_sizes: "path/to/chrom_sizes.txt" #  - `--chrom_sizes` (required): A file containing the chromosome sizes.
+output_dir: "path/to/output_directory" #  - `--output_dir` (required): The path to the output directory.
+exclude_regions: null  #  - `--exclude_regions` (optional): A file containing the regions to exclude from the analysis. Default is None.
+high_mappability: null  #  - `--high_mappability` (optional): A file containing mappability scores, in BED format. Default is None.`
+gc_correct: false #  - `--gc_correct` (optional): A flag to indicate whether to perform GC correction. Default is False.
+gc_correct_method: "standard" #  - `--gc_correct_method` (optional): Methods used in GC correction. Should be either standard or caret. Default is "standard".
+gc_correct_N: 1000000 #  - `--gc_correct_N` (optional): Maximal sample size for GC correction model training. Default is 1000000.
+idr_threshold: 1 #  - `--idr-threshold` (optional): The IDR threshold to use for filtering the CRAG IFS hotspots. Default is 1.
+min_mapq: 0 #  - `--min_mapq` (optional): The minimum mapping quality to use for filtering. Default is 0.
+min_fraglen: 0 #  - `--min_fraglen` (optional): The minimum fragment size to use for filtering. Default is 0.
+max_fraglen: 1000 #  - `--max_fraglen` (optional): The maximum fragment size to use for filtering. Default is 1000.
+window_size: 200 #  - `--window_size` (optional): The sliding window size to use for the CRAG IFS hotspots. Default is 200.
+step_size: 20 #  - `--step_size` (optional): The step size to use for the CRAG IFS hotspots. Default is 20.
