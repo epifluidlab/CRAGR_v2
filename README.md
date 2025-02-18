@@ -1,5 +1,5 @@
 # <img alt="yin-yang-two-colors" src="man/figures/CRAGR_v2.png" height="60"> ‎ ‎ ‎CRAGR_v2
-CRAGR_v2 (**C**ell f**R**ee dn**A** fra**G**mentation) is a pipeline for [CRAGR](https://github.com/epifluidlab/cragr) that incorporates Irreproducible Discovery Rate (IDR) to hotspot calling enable consistency between replicates or sets of samples.
+CRAGR_v2 (**C**ell f**R**ee dn**A** fra**G**mentation in **R**) is a pipeline for [CRAGR](https://github.com/epifluidlab/cragr) that incorporates Irreproducible Discovery Rate (IDR) to hotspot calling enable consistency between replicates or sets of samples.
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ conda activate CRAGR
 ## Workflow Diagram
 
 <p align="center">
-  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="1000">
+  <img src="man/figures/CRAGR_v2_workflow.png" alt="CRAGR_v2 Workflow Diagram" height="800">
 </p>
 
 ## Citation
