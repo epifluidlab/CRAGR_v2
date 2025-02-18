@@ -36,7 +36,7 @@ conda activate CRAGR
 </p>
 
 ## Citation
-Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo characterization of cell-free DNA fragmentation hotspots in plasma whole-genome sequencing. Genome Medicine [![Static Badge](https://img.shields.io/badge/DOI-10.1101/2020.07.16.201350-rebeccapurple?style=flat-square)](https://doi.org/10.1101/2020.07.16.201350)
+Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo characterization of cell-free DNA fragmentation hotspots in plasma whole-genome sequencing. Genome Medicine [![Static Badge](https://img.shields.io/badge/DOI-10.1101/2020.07.16.201350-red?style=flat-square)](https://doi.org/10.1101/2020.07.16.201350)
 
 ## Contact
 
