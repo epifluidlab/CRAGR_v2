@@ -16,13 +16,23 @@ CRAGR_v2 (**C**ell f**R**ee dn**A** fra**G**mentation in **R**) is a pipeline fo
 1. Create and activate a `conda` environment with a Python version greater than 3.8 and an R version greater than 4.1.
 
 ```bash
-conda create --name CRAGR python=3.11 r-base>=4.1
+conda create --name CRAGR python=3.11 r-base
 conda activate CRAGR
 ```
 
-2. Ensure that you have the proper dependencies (`snakemake`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
+2. Ensure that you have the proper dependencies (`snakemake`, `numpy`, `scipy`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
 ```bash
+# For Snakemake:
+pip install snakemake numpy scipy
 
+# For Tabix, BGZIP, and SAMTools:
+conda install bioconda::samtools
+
+# For BEDTools:
+conda install bioconda::bedtools
+
+#For IDR:
+Since IDR has such poor support, directions for this are TBD.
 ```
 
 ## Quick Start
@@ -65,9 +75,9 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
 - `gc_correct_method`: (DEFAULT: standard, OPTIONS=['standard', 'caret']) This determines the method used in the GC correction.
 - `gc_correct_N`: (DEFAULT: 1000000) This determines the maximal sample size for GC correction.
 - `idr_threshold`: (DEFAULT: 1) This determines the FDR threshold for calling hotspots from the IDR value for each peak.
-- `min_mapq`: (DEFAULT: 0) This is the minimum MAPQ score of a fragment to include it in the analysis.
-- `min_fraglen`: (DEFAULT: 0) This is the minimum fragment length to include it in the analysis.
-- `max_fraglen`: (DEFAULT: 1000) This is the maximum fragment length to include it in the analysis.
+- `min_mapq`: (DEFAULT: 0) This is the minimum MAPQ score of a fragment to include in the analysis.
+- `min_fraglen`: (DEFAULT: 0) This is the minimum fragment length to include in the analysis.
+- `max_fraglen`: (DEFAULT: 1000) This is the maximum fragment length to include in the analysis.
 - `window_size`: (DEFAULT: 200) This is the sliding window size to use for the CRAG IFS calculation.
 - `step_size`: (DEFAULT: 20) The step size to use for the CRAG IFS calculation.
 
