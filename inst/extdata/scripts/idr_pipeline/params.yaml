@@ -4,7 +4,7 @@ samples: "/projects/b1198/epifluidlab/ravi/0217/samples.txt"
 chroms: "/projects/b1198/epifluidlab/ravi/0217/hg38.chrom.sizes"
 genome: "hg38"
 chrom_sizes: "/projects/b1198/epifluidlab/ravi/0217/chroms.txt"
-output_dir: "path/to/output_directory"
+output_dir: "/projects/b1198/epifluidlab/ravi/0217/output"
 # seed:
 # exclude_regions:
 # high_mappability:
