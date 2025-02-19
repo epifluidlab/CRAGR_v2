@@ -35,6 +35,13 @@ conda install bioconda::bedtools
 Since IDR has such poor support, directions for this are TBD.
 ```
 
+3. Install CRAGR.
+
+```bash
+install.packages("devtools")
+devtools::install_github("epifluidlab/CRAGR_v2")
+```
+
 ## Quick Start
 
 1. Identify the path to the CRAGR_v2 pipeline by running the following in R.
