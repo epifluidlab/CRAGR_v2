@@ -13,14 +13,14 @@
 
 ## Installation
 
-1. Create and activate a `conda` environment with a Python version greater than 3.8 and an R version greater than 4.1.
+1. (`bash`) Create and activate a `conda` environment with a Python version greater than 3.8 and an R version greater than 4.1.
 
 ```bash
 conda create --name CRAGR python=3.11 r-base
 conda activate CRAGR
 ```
 
-2. Ensure that you have the proper dependencies (`snakemake`, `numpy`, `scipy`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
+2. (`bash`) Ensure that you have the proper dependencies (`snakemake`, `numpy`, `scipy`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
 ```bash
 # For Snakemake:
 pip install snakemake numpy scipy
@@ -35,7 +35,7 @@ conda install bioconda::bedtools
 Since IDR has such poor support, directions for this are TBD.
 ```
 
-3. Install CRAGR.
+3. (`R`) Install CRAGR.
 
 ```bash
 install.packages("devtools")
@@ -44,13 +44,13 @@ devtools::install_github("epifluidlab/CRAGR_v2")
 
 ## Quick Start
 
-1. Identify the path to the CRAGR_v2 pipeline by running the following in R.
+1. (`R`) Identify the path to the CRAGR_v2 pipeline.
 ```R
 system.file("extdata/scripts/idr_pipeline", "idr_cragr.smk", package = "cragr")
 ```
 2. Specify the relevant arguments for analysis in a `params.yaml` file. Check [here](#parameters) for more information.
 
-3. Run the snakemake pipeline by running the following in bash.
+3. (`bash`) Run the pipeline.
 ```bash
 snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores 16
 ```
