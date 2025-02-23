@@ -13,18 +13,15 @@
 
 ## Installation
 
-1. (`bash`) Create and activate a `conda` environment with a Python version greater than 3.8 and an R version greater than 4.1.
+1. (`bash`) Create and activate a `conda` environment with a Python 3.9.
 
 ```bash
-conda create --name CRAGR python=3.11 r-base
-conda activate CRAGR
+conda create --name idr_cragr python=3.9
+conda activate idr_cragr
 ```
 
-2. (`bash`) Ensure that you have the proper dependencies (`snakemake`, `numpy`, `scipy`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
+2. (`bash`) Ensure that you have the proper dependencies (`snakemake`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
 ```bash
-# For Snakemake:
-pip install snakemake numpy scipy
-
 # For Tabix, BGZIP, and SAMTools:
 conda install bioconda::samtools
 
@@ -32,7 +29,10 @@ conda install bioconda::samtools
 conda install bioconda::bedtools
 
 #For IDR:
-Since IDR has such poor support, directions for this are TBD.
+conda install bioconda::idr 
+
+# For Snakemake:
+pip install snakemake==7.32.4
 ```
 
 3. (`R`) Install CRAGR.
@@ -61,6 +61,7 @@ For a detailed understanding of the CRAG methods and analysis stages, we encoura
 Our pipeline takes the following arguments in YAML format. An example `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
 
 ### Required Parameters
+- `r_path`: (REQUIRED) This is a path to your R executable. You can usually find this with `which R`.
 - `r_script`: (REQUIRED) This is a path to the `CRAGR.r` script.
   - You can find this path by running `system.file("extdata/scripts", "cragr.R", package = "cragr")` OR
   - Locate the source code directory and look at `int/ext/scripts/`.

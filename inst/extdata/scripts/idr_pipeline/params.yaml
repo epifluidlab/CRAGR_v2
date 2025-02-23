@@ -1,11 +1,12 @@
 # CRAGR_v2
-r_script: "NONE"
+r_path: "/hpc/software/spack_v20d1/spack/opt/spack/linux-rhel7-x86_64/gcc-12.3.0/r-4.4.0-aaqsqjfnzw5p5c4twtddj4sxqi23pyfw/bin/R"
+r_script: "/home/myt8099/R/x86_64-pc-linux-gnu-library/4.4/cragr/extdata/scripts/cragr.R"
 samples: "/projects/b1198/epifluidlab/ravi/0217/samples.txt"
 chroms: "/projects/b1198/epifluidlab/ravi/0217/hg38.chrom.sizes"
 genome: "hg38"
 chrom_sizes: "/projects/b1198/epifluidlab/ravi/0217/chroms.txt"
 output_dir: "/projects/b1198/epifluidlab/ravi/0217/output"
-# seed:
+seed: 48
 # exclude_regions:
 # high_mappability:
 # gc_correct:

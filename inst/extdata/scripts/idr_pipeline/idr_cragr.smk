@@ -89,3 +89,5 @@ rule combine_samples:
         rep2_file_list = [line.strip() for line in open(input.rep2_samples)]
         combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms_list)
         combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms_list)
+
+# Run the CRAGR pipeline.
