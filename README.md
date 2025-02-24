@@ -30,7 +30,7 @@ conda install bioconda::bedtools
 
 #For IDR:
 conda install bioconda::idr 
-# cd ~.conda/envs/idr_cragr/lib/python3.9/site-packages/idr/idr.py
+# Open ~.conda/envs/idr_cragr/lib/python3.9/site-packages/idr/idr.py
 # Replace numpy.int in lines 299 and 300 with numpy.int_
 
 # For Snakemake:
