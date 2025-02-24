@@ -291,15 +291,24 @@ rule run_signal:
     
 rule concat_signal_results:
     input:
-        signal_files = expand(output_dir + "/{sample}.{chrom}.signal.bedGraph.gz", sample=ids_list, chrom=chroms_list)
+        signal_files = expand(output_dir + "/{sample}.{chrom}.signal.bedGraph.gz", sample=ids_list, chrom=chroms_list),
+        signal_files_index = expand(output_dir + "/{sample}.{chrom}.signal.bedGraph.gz.tbi", sample=ids_list, chrom=chroms_list)
     output:
         final_output = output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz"
     run:
         temp_output = output.final_output.replace('.gz', '')
         sorted_signal_files = sorted(input.signal_files, key=lambda f: chroms_list.index(f.split('.')[1]))
-        cmd = f"zcat {' '.join(sorted_signal_files)} > {temp_output}"
-        subprocess.run(cmd, shell=True, check=True)
+        sorted_signal_files_index = sorted(input.signal_files_index, key=lambda f: chroms_list.index(f.split('.')[1]))
+        with open(temp_output, 'w') as temp_f:
+            temp_f.write("#chrom\tstart\tend\tscore\tcov\tfrag_len\tgc\tscore_pre_gc\tz_score\n")
+        with open(temp_output, 'a') as temp_f:
+            for signal_file in sorted_signal_files:
+                with gzip.open(signal_file, 'rt') as f:
+                    for line in f:
+                        if not line.startswith("#"):
+                            temp_f.write(line)
         subprocess.run(["bgzip", temp_output])
         subprocess.run(["rm"] + sorted_signal_files)
+        subprocess.run(["rm"] + sorted_signal_files_index)
         subprocess.run(["tabix", "-pbed", temp_output + ".gz"])
         subprocess.run(["rm", temp_output])
