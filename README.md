@@ -30,6 +30,8 @@ conda install bioconda::bedtools
 
 #For IDR:
 conda install bioconda::idr 
+# cd ~.conda/envs/idr_cragr/lib/python3.9/site-packages/idr/idr.py
+# Replace numpy.int in lines 299 and 300 with numpy.int_
 
 # For Snakemake:
 pip install snakemake==7.32.4
@@ -61,11 +63,12 @@ For a detailed understanding of the CRAG methods and analysis stages, we encoura
 Our pipeline takes the following arguments in YAML format. An example `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
 
 ### Required Parameters
-- `r_path`: (REQUIRED) This is a path to your R executable. You can usually find this with `which R`.
-- `r_script`: (REQUIRED) This is a path to the `CRAGR.r` script.
+- `r_path`: (REQUIRED) This is a path to your Rscript executable. You can usually find this with `which Rscript`.
+- `cragr_script`: (REQUIRED) This is a path to the `CRAGR.r` script.
   - You can find this path by running `system.file("extdata/scripts", "cragr.R", package = "cragr")` OR
   - Locate the source code directory and look at `int/ext/scripts/`.
 - `samples`: (REQUIRED) This is a path to a file containing the paths to the relevant sample fragment files.
+  - These files must start with an ID that is separated by a `.`. For example `{ID}.frag.bed.gz`
   - All of these fragment files must have an associated `tabix` index.
 - `chroms`: (REQUIRED) This is a path to a file containing a list of chromosomes that hotspots and IFS scores should be retrieved for.
    - This file must be ordered, as this order determines the order of the sorting of the combined replicate fragment files.
@@ -82,7 +85,9 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
 - `gc_correct`: (DEFAULT: True)  This is a boolean parameter that determines whether or not to perform GC correction.
 - `gc_correct_method`: (DEFAULT: standard, OPTIONS=['standard', 'caret']) This determines the method used in the GC correction.
 - `gc_correct_N`: (DEFAULT: 1000000) This determines the maximal sample size for GC correction.
-- `idr_threshold`: (DEFAULT: 1) This determines the FDR threshold for calling hotspots from the IDR value for each peak.
+- `fdr_threshold`: (DEFAULT: 0.2) This determines the FDR cutoff for filtering peaks after Stage 2 analysis and before IDR.
+- `merge_gap`: (DEFAULT: 200) If the distance between two hotspot intervals is less than this value, they will be merged into one larger hotspot.
+- `idr_threshold`: (DEFAULT: 0.05) This determines the cutoff for filtering peaks from the IDR value for each peak.
 - `min_mapq`: (DEFAULT: 0) This is the minimum MAPQ score of a fragment to include in the analysis.
 - `min_fraglen`: (DEFAULT: 0) This is the minimum fragment length to include in the analysis.
 - `max_fraglen`: (DEFAULT: 1000) This is the maximum fragment length to include in the analysis.
@@ -101,7 +106,6 @@ Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo chara
 ## Contact
 
 - Ravi Bandaru: ravi.bandaru@northwestern.edu
-- Kundan Baliga: kudosbeluga@gmail.com
 - Yaping Liu: yaping@northwestern.edu
 
 ## License
