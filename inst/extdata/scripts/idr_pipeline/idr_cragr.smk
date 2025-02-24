@@ -175,6 +175,7 @@ rule concat_chrom_results:
         
         subprocess.run(["bgzip", "-f", temp_output])
         subprocess.run(["rm"] + glob.glob(f"{output_dir}/rep{wildcards.rep}.*.rawifs.bed.gz"))
+        subprocess.run(["rm"] + glob.glob(f"{output_dir}/rep{wildcards.rep}.*.rawifs.bed.gz.tbi"))
         subprocess.run(["tabix", "-pbed", temp_output + ".gz"])
 
 # Run the CRAGR PEAK pipeline (Stage 2 Analysis).
