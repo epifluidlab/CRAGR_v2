@@ -33,6 +33,7 @@ basename = basenames[0]
 input_dir = get_input_dir(samples_list[0])
 chroms = config['chroms']
 chroms_list = [line.strip() for line in open(chroms)]
+chroms_string = ":".join(chroms_list)
 genome = config['genome']
 if genome =="hg19":
     genome = "GRCh37"
@@ -90,7 +91,7 @@ def combine_samples_to_reps(file_list, output_file, chroms_list):
             out_f.write('\t'.join(line) + '\n')
     
     subprocess.run(["bgzip", "-f", sorted_output])
-    subprocess.run(["rm", temp_output])
+    #subprocess.run(["rm", temp_output])
     subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
 
 rule all:
@@ -174,8 +175,8 @@ rule concat_chrom_results:
                             out_f.write(line)
         
         subprocess.run(["bgzip", "-f", temp_output])
-        subprocess.run(["rm"] + glob.glob(f"{output_dir}/rep{wildcards.rep}.*.rawifs.bed.gz"))
-        subprocess.run(["rm"] + glob.glob(f"{output_dir}/rep{wildcards.rep}.*.rawifs.bed.gz.tbi"))
+        #subprocess.run(["rm"] + glob.glob(f"{output_dir}/rep{wildcards.rep}.*.rawifs.bed.gz"))
+        #subprocess.run(["rm"] + glob.glob(f"{output_dir}/rep{wildcards.rep}.*.rawifs.bed.gz.tbi"))
         subprocess.run(["tabix", "-pbed", temp_output + ".gz"])
 
 # Run the CRAGR PEAK pipeline (Stage 2 Analysis).
@@ -259,7 +260,7 @@ rule run_signal:
         frag_file = input_dir + "/" + reverse_format_sample("{sample}", basename),
         idr_file = output_dir + "/hotspot.idr.filtered.bed.gz"
     output:
-        signal_file = output_dir + "/{sample}.{chrom}.signal.bedGraph.gz"
+        signal_file = output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz"
     params:
         gc_correct_flag = "--gc-correct" if gc_correct else "",
         gc_correct_method_param = f"--gc-correct-method={gc_correct_method}",
@@ -277,7 +278,7 @@ rule run_signal:
         --hotspot {input.idr_file} \
         -o {output.signal_file} \
         --genome {genome} \
-        --chrom {wildcards.chrom} \
+        --chrom {chroms_string} \
         {params.gc_correct_flag} \
         {params.gc_correct_method_param} \
         {params.gc_correct_n_param} \
@@ -288,27 +289,3 @@ rule run_signal:
         {params.min_fraglen_param} \
         {params.max_fraglen_param}
         """
-    
-rule concat_signal_results:
-    input:
-        signal_files = expand(output_dir + "/{sample}.{chrom}.signal.bedGraph.gz", sample=ids_list, chrom=chroms_list),
-        signal_files_index = expand(output_dir + "/{sample}.{chrom}.signal.bedGraph.gz.tbi", sample=ids_list, chrom=chroms_list)
-    output:
-        final_output = output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz"
-    run:
-        temp_output = output.final_output.replace('.gz', '')
-        sorted_signal_files = sorted(input.signal_files, key=lambda f: chroms_list.index(f.split('.')[1]))
-        sorted_signal_files_index = sorted(input.signal_files_index, key=lambda f: chroms_list.index(f.split('.')[1]))
-        with open(temp_output, 'w') as temp_f:
-            temp_f.write("#chrom\tstart\tend\tscore\tcov\tfrag_len\tgc\tscore_pre_gc\tz_score\n")
-        with open(temp_output, 'a') as temp_f:
-            for signal_file in sorted_signal_files:
-                with gzip.open(signal_file, 'rt') as f:
-                    for line in f:
-                        if not line.startswith("#"):
-                            temp_f.write(line)
-        subprocess.run(["bgzip", temp_output])
-        subprocess.run(["rm"] + sorted_signal_files)
-        subprocess.run(["rm"] + sorted_signal_files_index)
-        subprocess.run(["tabix", "-pbed", temp_output + ".gz"])
-        subprocess.run(["rm", temp_output])
