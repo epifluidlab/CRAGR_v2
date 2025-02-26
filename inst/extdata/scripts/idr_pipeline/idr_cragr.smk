@@ -99,6 +99,7 @@ def combine_samples_to_reps(file_list, output_file, chroms_list, subsample):
 rule all:
     input:
         expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list)
+        expand(output_dir + "/sample_hotspots/combined.signal.bedGraph.gz")
 
 # Split the samples into two replicate lists.
 rule split_files:
