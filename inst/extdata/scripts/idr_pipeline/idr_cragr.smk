@@ -291,3 +291,28 @@ rule run_signal:
         {params.min_fraglen_param} \
         {params.max_fraglen_param}
         """
+
+# Combine the signal files into a single file.
+def combine_samples(list_of_filenames, output_dir):
+    import pandas as pd
+    dfs = []
+    for file in list_of_filenames:
+        id = format_sample(file)
+        df = pd.read_csv(file, sep='\t', header=None, comment='#', usecols=[0, 1, 2, 3], names=['chrom', 'start', 'end', 'signal'])
+        df.rename(columns={'signal': id}, inplace=True)
+        df.replace('.', float('nan'), inplace=True)
+        df[id] = df[id].astype(float)
+        dfs.append(df)
+    combined_df = df[0]
+    for df in dfs[1:]:
+        combined_df = pd.merge(combined_df, df, on=['chrom', 'start', 'end'], how='outer')
+    combined_df.to_csv(output_dir + "/sample_hotspots/combined.signal.bedGraph.gz", sep='\t', index=False, compression='gzip')
+
+
+rule combine_signal:
+    input:
+        signal_files = expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list)
+    output:
+        combined_signal = output_dir + "/sample_hotspots/combined.signal.bedGraph.gz"
+    run:
+        combine_samples(input.signal_files, output_dir)
