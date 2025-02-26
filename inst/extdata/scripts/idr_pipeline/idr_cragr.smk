@@ -100,7 +100,7 @@ def combine_samples_to_reps(file_list, output_file, chroms_list, split_method, s
             line_count = int(len_f.readline())
         if line_count < total_fragment_min:
             raise ValueError("The total number of fragments in the input files is less than minimum number of fragments to run the pipeline. Check the documentation for more details.")
-        selected_indices = set(random.sample(range(line_count), subsample_size))
+        selected_indices = set(random.sample(range(line_count), subsample))
         with open(combined_path, 'rb') as in_f, open(temp_output, 'wb') as out_f:
             for i, line in enumerate(in_f):
                 if i in selected_indices:
