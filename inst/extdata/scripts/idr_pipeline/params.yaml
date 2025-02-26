@@ -7,6 +7,7 @@
 # chrom_sizes:
 # output_dir:
 # seed:
+# subsample:
 # exclude_regions:
 # high_mappability:
 # gc_correct:

@@ -79,6 +79,7 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
 
 ### Optional Parameters
 - `seed`: (DEFAULT: None) This is an integer that sets the seed of the random splitting of the files for reproducibility.
+- `subsample`: (DEFAULT: None) For a large number of samples, the combined replicate fragment file might be too large. This argument sets the number of fragments to subsample from the combined replicate for downstream analysis.
 - `exclude_regions`: (DEFAULT: None)  This is the path to a blacklist BED file, highlighting problematic areas of the genome to ignore.
   - You can learn more about the blacklist file purpose [here](https://www.nature.com/articles/s41598-019-45839-z).
 - `high_mappability`: (DEFAULT: None)  This is a path to a file containing mappability scores in BED format. Restricts the analysis of the genome to high mappability regions.

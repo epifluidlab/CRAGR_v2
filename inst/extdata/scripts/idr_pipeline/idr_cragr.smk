@@ -47,6 +47,7 @@ os.makedirs(output_dir + "/sample_hotspots", exist_ok=True)
 
 # Optional arguments.
 seed = config.get('seed', None)
+subsample = config.get('subsample', None)
 exclude_regions = config.get('exclude_regions', None)
 high_mappability = config.get('high_mappability', None)
 gc_correct = config.get('gc_correct', True)
@@ -74,13 +75,14 @@ def split_files_to_reps(list_of_filenames, seed=None):
     return rep1, rep2
 
 # Function to combine the files into merged replicate file.
-def combine_samples_to_reps(file_list, output_file, chroms_list):
+def combine_samples_to_reps(file_list, output_file, chroms_list, subsample):
     temp_output = output_file.replace(".sorted.gz", "")
     with open(temp_output, 'wb') as out_f:
         for file in file_list:
             with subprocess.Popen(["zcat", file], stdout=subprocess.PIPE) as proc:
                 shutil.copyfileobj(proc.stdout, out_f)
-    
+    if subsample is not None:
+        subprocess.run(["shuf", "-n", str(subsample), temp_output, "-o", temp_output])
     sorted_output = temp_output + ".sorted"
     with open(temp_output, 'r') as in_f, open(sorted_output, 'w') as out_f:
         lines = [line.strip().split('\t') for line in in_f if not line.startswith('#')]
@@ -120,8 +122,8 @@ rule combine_samples:
     run:
         rep1_file_list = [line.strip() for line in open(input.rep1_samples)]
         rep2_file_list = [line.strip() for line in open(input.rep2_samples)]
-        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms_list)
-        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms_list)
+        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms_list, subsample)
+        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms_list, subsample)
 
 # Run the CRAGR IFS pipeline (Stage 1 Analysis).
 rule run_ifs_per_chrom:
