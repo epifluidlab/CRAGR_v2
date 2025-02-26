@@ -46,8 +46,11 @@ os.makedirs(output_dir, exist_ok=True)
 os.makedirs(output_dir + "/sample_hotspots", exist_ok=True)
 
 # Optional arguments.
+split_method = config.get('split_method', 'fragment_count')
+if split_method not in ['fragment_count', 'by_sample']:
+    raise ValueError("The split method must be either 'fragment_count' or 'by_sample'.")
 seed = config.get('seed', None)
-subsample = config.get('subsample', None)
+subsample = config.get('subsample', 200_000_000)
 exclude_regions = config.get('exclude_regions', None)
 high_mappability = config.get('high_mappability', None)
 gc_correct = config.get('gc_correct', True)
@@ -63,9 +66,12 @@ max_fraglen = config.get('max_fraglen', 1000)
 window_size = config.get('window_size', 200)
 step_size = config.get('step_size', 20)
 flank = (window_size - step_size) / 2
+total_fragment_min = config.get('total_fragment_min', 1.5*subsample)
 
 # Function to split the files into two replicates.
-def split_files_to_reps(list_of_filenames, seed=None):
+def split_files_to_reps(list_of_filenames, split_method, seed=None):
+    if split_method=="fragment_count":
+        return [], []
     if seed is not None:
         random.seed(seed)
     shuffled = list_of_filenames[:]
@@ -75,30 +81,64 @@ def split_files_to_reps(list_of_filenames, seed=None):
     return rep1, rep2
 
 # Function to combine the files into merged replicate file.
-def combine_samples_to_reps(file_list, output_file, chroms_list, subsample):
-    temp_output = output_file.replace(".sorted.gz", "")
-    with open(temp_output, 'wb') as out_f:
-        for file in file_list:
-            with subprocess.Popen(["zcat", file], stdout=subprocess.PIPE) as proc:
-                shutil.copyfileobj(proc.stdout, out_f)
-    if subsample is not None:
-        subprocess.run(["shuf", "-n", str(subsample), temp_output, "-o", temp_output])
-    sorted_output = temp_output + ".sorted"
-    with open(temp_output, 'r') as in_f, open(sorted_output, 'w') as out_f:
-        lines = [line.strip().split('\t') for line in in_f if not line.startswith('#')]
-        lines = [line for line in lines if line[0] in chroms_list]
-        chrom_order = {chrom: i for i, chrom in enumerate(chroms_list)}
-        lines.sort(key=lambda x: (chrom_order.get(x[0], float('inf')), int(x[1]), int(x[2])))
-        for line in lines:
-            out_f.write('\t'.join(line) + '\n')
-    
-    subprocess.run(["bgzip", "-f", sorted_output])
-    #subprocess.run(["rm", temp_output])
-    subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
+def combine_samples_to_reps(file_list, output_file, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample):
+    if split_method=="fragment_count":
+        random.seed(seed)
+        combined_path = os.path.dirname(output_file) + "/combined_fragments"
+        length_path = os.path.dirname(output_file) + "/combined_fragments_len"
+        line_count = 0
+        if not os.path.exists(combined_path):
+            with open(combined_path, 'wb') as out_f, open(length_path, 'w') as len_f:
+                for file in samples_list:
+                    with subprocess.Popen(["zcat", file], stdout=subprocess.PIPE) as proc:
+                        for line in proc.stdout:
+                            out_f.write(line)
+                            line_count += 1
+                len_f.write(str(line_count))
+        temp_output = output_file.replace(".sorted.gz", "")
+        with open(length_path, 'r') as len_f:
+            line_count = int(len_f.readline())
+        if line_count < total_fragment_min:
+            raise ValueError("The total number of fragments in the input files is less than minimum number of fragments to run the pipeline. Check the documentation for more details.")
+        selected_indices = set(random.sample(range(line_count), subsample_size))
+        with open(combined_path, 'rb') as in_f, open(temp_output, 'wb') as out_f:
+            for i, line in enumerate(in_f):
+                if i in selected_indices:
+                    out_f.write(line)
+        sorted_output = temp_output + ".sorted"
+        with open(temp_output, 'r') as in_f, open(sorted_output, 'w') as out_f:
+            lines = [line.strip().split('\t') for line in in_f if not line.startswith('#')]
+            lines = [line for line in lines if line[0] in chroms_list]
+            chrom_order = {chrom: i for i, chrom in enumerate(chroms_list)}
+            lines.sort(key=lambda x: (chrom_order.get(x[0], float('inf')), int(x[1]), int(x[2])))
+            for line in lines:
+                out_f.write('\t'.join(line) + '\n')
+        subprocess.run(["bgzip", "-f", sorted_output])
+        #subprocess.run(["rm", temp_output])
+        subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
+        
+    else:
+        temp_output = output_file.replace(".sorted.gz", "")
+        with open(temp_output, 'wb') as out_f:
+            for file in file_list:
+                with subprocess.Popen(["zcat", file], stdout=subprocess.PIPE) as proc:
+                    shutil.copyfileobj(proc.stdout, out_f)
+        sorted_output = temp_output + ".sorted"
+        with open(temp_output, 'r') as in_f, open(sorted_output, 'w') as out_f:
+            lines = [line.strip().split('\t') for line in in_f if not line.startswith('#')]
+            lines = [line for line in lines if line[0] in chroms_list]
+            chrom_order = {chrom: i for i, chrom in enumerate(chroms_list)}
+            lines.sort(key=lambda x: (chrom_order.get(x[0], float('inf')), int(x[1]), int(x[2])))
+            for line in lines:
+                out_f.write('\t'.join(line) + '\n')
+        
+        subprocess.run(["bgzip", "-f", sorted_output])
+        #subprocess.run(["rm", temp_output])
+        subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
 
 rule all:
     input:
-        expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list)
+        expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list),
         expand(output_dir + "/sample_hotspots/combined.signal.bedGraph.gz")
 
 # Split the samples into two replicate lists.
@@ -107,7 +147,7 @@ rule split_files:
         rep1 = output_dir + "/rep1_samples.txt",
         rep2 = output_dir + "/rep2_samples.txt"
     run:
-        rep1_samples, rep2_samples = split_files_to_reps(samples_list, seed=seed)
+        rep1_samples, rep2_samples = split_files_to_reps(samples_list, split_method, seed=seed)
         with open(output.rep1, 'w') as f1, open(output.rep2, 'w') as f2:
             f1.write("\n".join(rep1_samples) + "\n")
             f2.write("\n".join(rep2_samples) + "\n")
@@ -123,8 +163,8 @@ rule combine_samples:
     run:
         rep1_file_list = [line.strip() for line in open(input.rep1_samples)]
         rep2_file_list = [line.strip() for line in open(input.rep2_samples)]
-        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms_list, subsample)
-        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms_list, subsample)
+        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample)
+        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms_list, split_method, samples_list, total_fragment_min, seed+1, subsample)
 
 # Run the CRAGR IFS pipeline (Stage 1 Analysis).
 rule run_ifs_per_chrom:
@@ -218,7 +258,7 @@ rule idr_preprocess:
     shell:
         """
         zcat {input.ifs_file} | \
-        awk -F'\t' -v OFS="\t" 'substr($1,1,1)!="#" && $17<={fdr_threshold} && $16!="."' | \
+        awk -F'\t' -v OFS="\t" 'substr($1,1,1)!="#" && $17<={fdr_threshold} && $17!="."' | \
         bedtools slop -g {chrom_sizes} -i - -b {flank} -header | \
         bedtools merge -header -i - -d {merge_gap} -c 9,16,17 -o min | \
         perl -ne 'chomp;@f=split "\t";$f[3]=0-$f[3];$f[4]=0-log($f[4])/log(10);$f[5]=0-log($f[5])/log(10);print "$f[0]\t$f[1]\t$f[2]\t.\t0\t.\t$f[3]\t$f[4]\t$f[5]\t-1\n";' \

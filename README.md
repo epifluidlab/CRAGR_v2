@@ -78,8 +78,11 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
    - If this directory does not exist, it will be created.
 
 ### Optional Parameters
-- `seed`: (DEFAULT: None) This is an integer that sets the seed of the random splitting of the files for reproducibility.
-- `subsample`: (DEFAULT: None) For a large number of samples, the combined replicate fragment file might be too large. This argument sets the number of fragments to subsample from the combined replicate for downstream analysis.
+- `split_method`: (DEFAULT: fragment_count, OPTIONS:['fragment_count', 'by_sample']) This is determines how the fragments are split into the replicates.
+  - `fragment_count`: This will combine all of the fragment files and take `--subsample` fragments in each replicate with replacement. This inherently introduces overlaps to the replicates. To avoid very similar replicates, the total fragment count of all fragment files must be greater than `1.5*--subsample`.
+  - `samples`: This will generate an equal split of the files into replicates. This ensures that the replicates have no data overlap.
+- `seed`: (DEFAULT: None) This is an integer that sets the seed of the random splitting of the replicates for reproducibility.
+- `subsample`: (DEFAULT: 200M) For a large number of samples, the combined replicate fragment file might be too large. This argument sets the number of fragments to subsample from the combined replicate for downstream analysis.
 - `exclude_regions`: (DEFAULT: None)  This is the path to a blacklist BED file, highlighting problematic areas of the genome to ignore.
   - You can learn more about the blacklist file purpose [here](https://www.nature.com/articles/s41598-019-45839-z).
 - `high_mappability`: (DEFAULT: None)  This is a path to a file containing mappability scores in BED format. Restricts the analysis of the genome to high mappability regions.
@@ -94,6 +97,7 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
 - `max_fraglen`: (DEFAULT: 1000) This is the maximum fragment length to include in the analysis.
 - `window_size`: (DEFAULT: 200) This is the sliding window size to use for the CRAG IFS calculation.
 - `step_size`: (DEFAULT: 20) The step size to use for the CRAG IFS calculation.
+- `total_fragment_min`  (DEFAULT: `1.5*--subsample`) This determines the minimum total fragments across your fragment files to allow the pipeline to run without throwing an error. Modify this threshold at your own risk.
 
 ## Workflow Diagram
 
