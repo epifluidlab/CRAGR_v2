@@ -81,59 +81,69 @@ def split_files_to_reps(list_of_filenames, split_method, seed=None):
     return rep1, rep2
 
 # Function to combine the files into merged replicate file.
-def combine_samples_to_reps(file_list, output_file, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample):
-    if split_method=="fragment_count":
+def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq):
+    if split_method == "fragment_count":
         random.seed(seed)
-        combined_path = os.path.dirname(output_file) + "/combined_fragments"
-        length_path = os.path.dirname(output_file) + "/combined_fragments_len"
+        combined_path = os.path.join(os.path.dirname(output_file), "combined_fragments")
+        length_path = os.path.join(os.path.dirname(output_file), "combined_fragments_len")
         line_count = 0
         if not os.path.exists(combined_path):
             with open(combined_path, 'wb') as out_f, open(length_path, 'w') as len_f:
                 for file in samples_list:
                     with subprocess.Popen(["zcat", file], stdout=subprocess.PIPE) as proc:
                         for line in proc.stdout:
-                            out_f.write(line)
-                            line_count += 1
+                            line = line.decode('utf-8').strip()
+                            if not line.startswith('#'):
+                                fields = line.split('\t')
+                                chrom = fields[0]
+                                start = int(fields[1])
+                                end = int(fields[2])
+                                mapq = int(fields[4])
+                                fraglen = end - start
+                                if chrom in chroms_list and fraglen >= min_fraglen and fraglen <= max_fraglen and mapq >= min_mapq:
+                                    out_f.write((line + '\n').encode('utf-8'))
+                                    line_count += 1
                 len_f.write(str(line_count))
         temp_output = output_file.replace(".sorted.gz", "")
         with open(length_path, 'r') as len_f:
             line_count = int(len_f.readline())
         if line_count < total_fragment_min:
-            raise ValueError("The total number of fragments in the input files is less than minimum number of fragments to run the pipeline. Check the documentation for more details.")
+            raise ValueError("The total number of fragments in the input files is less than the minimum number of fragments to run the pipeline. Check the documentation for more details.")
         selected_indices = set(random.sample(range(line_count), subsample))
         with open(combined_path, 'rb') as in_f, open(temp_output, 'wb') as out_f:
             for i, line in enumerate(in_f):
                 if i in selected_indices:
                     out_f.write(line)
         sorted_output = temp_output + ".sorted"
-        with open(temp_output, 'r') as in_f, open(sorted_output, 'w') as out_f:
-            lines = [line.strip().split('\t') for line in in_f if not line.startswith('#')]
-            lines = [line for line in lines if line[0] in chroms_list]
-            chrom_order = {chrom: i for i, chrom in enumerate(chroms_list)}
-            lines.sort(key=lambda x: (chrom_order.get(x[0], float('inf')), int(x[1]), int(x[2])))
-            for line in lines:
-                out_f.write('\t'.join(line) + '\n')
+        print("Sorting the combined fragments with bedtools.")
+        with open(sorted_output, "w") as out_file:
+            subprocess.run(["bedtools", "sort", "-i", temp_output, "-g", chroms], stdout=out_file)
         subprocess.run(["bgzip", "-f", sorted_output])
-        #subprocess.run(["rm", temp_output])
         subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
-        
+
     else:
         temp_output = output_file.replace(".sorted.gz", "")
+        line_count = 0
         with open(temp_output, 'wb') as out_f:
             for file in file_list:
                 with subprocess.Popen(["zcat", file], stdout=subprocess.PIPE) as proc:
-                    shutil.copyfileobj(proc.stdout, out_f)
+                    for line in proc.stdout:
+                        line = line.decode('utf-8').strip()
+                        if not line.startswith('#'):
+                            fields = line.split('\t')
+                            chrom = fields[0]
+                            start = int(fields[1])
+                            end = int(fields[2])
+                            mapq = int(fields[4])
+                            fraglen = end - start
+                            if chrom in chroms_list and fraglen >= min_fraglen and fraglen <= max_fraglen and mapq >= min_mapq:
+                                out_f.write((line + '\n').encode('utf-8'))
+                                line_count += 1
         sorted_output = temp_output + ".sorted"
-        with open(temp_output, 'r') as in_f, open(sorted_output, 'w') as out_f:
-            lines = [line.strip().split('\t') for line in in_f if not line.startswith('#')]
-            lines = [line for line in lines if line[0] in chroms_list]
-            chrom_order = {chrom: i for i, chrom in enumerate(chroms_list)}
-            lines.sort(key=lambda x: (chrom_order.get(x[0], float('inf')), int(x[1]), int(x[2])))
-            for line in lines:
-                out_f.write('\t'.join(line) + '\n')
-        
+        print("Sorting the combined fragments with bedtools.")
+        with open(sorted_output, "w") as out_file:
+            subprocess.run(["bedtools", "sort", "-i", temp_output, "-g", chroms], stdout=out_file)
         subprocess.run(["bgzip", "-f", sorted_output])
-        #subprocess.run(["rm", temp_output])
         subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
 
 rule all:
@@ -163,8 +173,8 @@ rule combine_samples:
     run:
         rep1_file_list = [line.strip() for line in open(input.rep1_samples)]
         rep2_file_list = [line.strip() for line in open(input.rep2_samples)]
-        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample)
-        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms_list, split_method, samples_list, total_fragment_min, seed+1, subsample)
+        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq)
+        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed+1, subsample, min_fraglen, max_fraglen, min_mapq)
 
 # Run the CRAGR IFS pipeline (Stage 1 Analysis).
 rule run_ifs_per_chrom:
@@ -336,6 +346,7 @@ rule run_signal:
 # Combine the signal files into a single file.
 def combine_samples(list_of_filenames, output_dir):
     import pandas as pd
+    list_of_filenames = list(list_of_filenames)
     dfs = []
     for file in list_of_filenames:
         id = format_sample(file)
@@ -344,7 +355,7 @@ def combine_samples(list_of_filenames, output_dir):
         df.replace('.', float('nan'), inplace=True)
         df[id] = df[id].astype(float)
         dfs.append(df)
-    combined_df = df[0]
+    combined_df = dfs[0]
     for df in dfs[1:]:
         combined_df = pd.merge(combined_df, df, on=['chrom', 'start', 'end'], how='outer')
     combined_df.to_csv(output_dir + "/sample_hotspots/combined.signal.bedGraph.gz", sep='\t', index=False, compression='gzip')
