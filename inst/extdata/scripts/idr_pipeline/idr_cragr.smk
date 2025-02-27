@@ -149,7 +149,8 @@ def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_m
 rule all:
     input:
         expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list),
-        expand(output_dir + "/sample_hotspots/combined.signal.bedGraph.gz")
+        expand(output_dir + "/sample_hotspots/combined.signal.bedGraph.gz"),
+        expand(output_dir + "/cleanup.done")
 
 # Split the samples into two replicate lists.
 rule split_files:
@@ -368,3 +369,28 @@ rule combine_signal:
         combined_signal = output_dir + "/sample_hotspots/combined.signal.bedGraph.gz"
     run:
         combine_samples(input.signal_files, output_dir)
+
+rule cleanup:
+    input:
+        expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list),
+        output_dir + "/sample_hotspots/combined.signal.bedGraph.gz"
+    output:
+        output_dir + "/cleanup.done"
+    shell:
+        """
+        # Remove intermediate files from rep1 and rep2
+        rm -f {output_dir}/rep*.frag
+        rm -f {output_dir}/rep*.*.rawifs.bed.gz
+        rm -f {output_dir}/rep*.*.rawifs.bed.gz.tbi
+        
+        # Remove intermediate bed and bedGraph files
+        # rm -f {output_dir}/rep*.hotspot.narrowpeak
+        
+        # Remove other temporary files
+        rm -f {output_dir}/combined_fragments*
+        rm -f {output_dir}/*.log
+        
+        # Keep the final IDR results and signal files
+        echo "Cleanup completed. All intermediate files have been removed."
+        touch {output_dir}/cleanup.done
+        """
