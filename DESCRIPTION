@@ -34,7 +34,7 @@ Imports:
     bedtorch (>= 0.1.12.12),
     sva
 Remotes: 
-    haizi-zh/bedtorch,
+    epifluidlab/bedtorch,
     bioc::sva
 LinkingTo: 
     Rcpp
