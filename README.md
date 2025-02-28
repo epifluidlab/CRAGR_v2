@@ -20,7 +20,7 @@ conda create --name idr_cragr python=3.9
 conda activate idr_cragr
 ```
 
-2. (`bash`) Ensure that you have the proper dependencies (`snakemake`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`) installed.
+2. (`bash`) Ensure that you have the proper dependencies (`snakemake`, `tabix`, `bgzip`, `samtools`, `bedtools`, `idr`, `libiconv`) installed.
 ```bash
 # For Tabix, BGZIP, and SAMTools:
 conda install bioconda::samtools
@@ -35,6 +35,12 @@ conda install bioconda::idr
 
 # For Snakemake:
 pip install snakemake==7.32.4
+
+# NOTE: For some HPC systems, libiconv.so may not be detected for the CRAGR installation process
+# You may have to manually add libiconv to the path in this case, like so:
+
+conda install conda-forge::libiconv
+export $LD_LIBRARY_PATH=<PATH TO CONDA LIBRARY FOLDER>
 ```
 
 3. (`R`) Install CRAGR.
@@ -111,6 +117,7 @@ Zhou X, Zheng H, Fu H, McKillip KL, Pinney SM, Liu Y. (2022) CRAG: De novo chara
 ## Contact
 
 - Ravi Bandaru: ravi.bandaru@northwestern.edu
+- Kundan Baliga: kundanbal2969@k12.ipsd.org
 - Yaping Liu: yaping@northwestern.edu
 
 ## License
