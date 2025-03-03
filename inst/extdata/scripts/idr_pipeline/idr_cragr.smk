@@ -275,6 +275,12 @@ rule idr_preprocess:
         bedtools merge -header -i - -d {merge_gap} -c 9,16,17 -o min | \
         perl -ne 'chomp;@f=split "\t";$f[3]=0-$f[3];$f[4]=0-log($f[4])/log(10);$f[5]=0-log($f[5])/log(10);print "$f[0]\t$f[1]\t$f[2]\t.\t0\t.\t$f[3]\t$f[4]\t$f[5]\t-1\n";' \
         > {output.peak_format}
+
+        line_count=$(wc -l < {output.peak_format})
+        echo "# of peaks in {output.peak_format}: $line_count"
+        if [ "$line_count" -lt 50000 ]; then
+            echo "WARNING: {output.peak_format} has fewer than 50,000 peaks!"
+        fi
         """
 
 rule idr:
