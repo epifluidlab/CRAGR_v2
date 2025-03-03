@@ -98,7 +98,7 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
 - `fdr_threshold`: (DEFAULT: 0.2) This determines the FDR cutoff for filtering peaks after Stage 2 analysis and before IDR.
 - `merge_gap`: (DEFAULT: 200) If the distance between two hotspot intervals is less than this value, they will be merged into one larger hotspot.
 - `idr_threshold`: (DEFAULT: 0.05) This determines the cutoff for filtering peaks from the IDR value for each peak.
-- `min_mapq`: (DEFAULT: 0) This is the minimum MAPQ score of a fragment to include in the analysis.
+- `min_mapq`: (DEFAULT: 30) This is the minimum MAPQ score of a fragment to include in the analysis.
 - `min_fraglen`: (DEFAULT: 0) This is the minimum fragment length to include in the analysis.
 - `max_fraglen`: (DEFAULT: 1000) This is the maximum fragment length to include in the analysis.
 - `window_size`: (DEFAULT: 200) This is the sliding window size to use for the CRAG IFS calculation.

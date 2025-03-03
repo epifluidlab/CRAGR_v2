@@ -60,7 +60,7 @@ fdr_threshold = config.get('fdr_threshold', 0.2)
 merge_gap = config.get('merge_gap', 200)
 idr_threshold = config.get('idr_threshold', 0.05)
 idr_threshold = -math.log10(idr_threshold)
-min_mapq = config.get('min_mapq', 0)
+min_mapq = config.get('min_mapq', 30)
 min_fraglen = config.get('min_fraglen', 0)
 max_fraglen = config.get('max_fraglen', 1000)
 window_size = config.get('window_size', 200)
@@ -83,7 +83,8 @@ def split_files_to_reps(list_of_filenames, split_method, seed=None):
 # Function to combine the files into merged replicate file.
 def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq):
     if split_method == "fragment_count":
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
         combined_path = os.path.join(os.path.dirname(output_file), "combined_fragments")
         length_path = os.path.join(os.path.dirname(output_file), "combined_fragments_len")
         line_count = 0
