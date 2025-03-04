@@ -81,7 +81,7 @@ Our pipeline takes the following arguments in YAML format. A blank `params.yaml`
    - This file must be ordered, as this order determines the order of the sorting of the combined replicate fragment files.
 - `genome`: (REQUIRED, OPTIONS=['hg19', 'hg38']) This is the name of the genome build to use for the CRAG pipeline. 
 - `chrom_sizes`: (REQUIRED) This is the path to a file containing the chromosome sizes for the relevant `--genome`.
-  - See [inst/extdata/scripts/data/](inst/extdata/scripts/idr_pipeline/data) for .chrom.sizes files for `hg19` and `hg38`.
+  - See [`inst/extdata/scripts/data/``](inst/extdata/scripts/idr_pipeline/data) for .chrom.sizes files for `hg19` and `hg38`.
 - `output_dir`: This is the path to a directory that all intermediate and output files will be stored in. 
    - If this directory does not exist, it will be created.
 
