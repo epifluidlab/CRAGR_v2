@@ -10,7 +10,6 @@ split_method: fragment_count
 seed: 42
 subsample: 500_000
 exclude_regions: ../hg38/hg38.exclude.regions
-high_mappability: ../hg38/hg38.high.mappability.regions
 gc_correct: True
 gc_correct_method: standard
 gc_correct_N: 1_000_000

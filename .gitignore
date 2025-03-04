@@ -1,1 +1,3 @@
 inst/extdata/scripts/idr_pipeline/.snakemake
+inst/extdata/scripts/idr_pipeline/data/example/.snakemake
+inst/extdata/scripts/idr_pipeline/data/example_output

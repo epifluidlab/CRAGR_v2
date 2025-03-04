@@ -1,4 +1,4 @@
-./frag/S1.frag.bed.gz
-./frag/S2.frag.bed.gz
-./frag/S3.frag.bed.gz
-./frag/S4.frag.bed.gz
+frag/S1.frag.bed.gz
+frag/S2.frag.bed.gz
+frag/S3.frag.bed.gz
+frag/S4.frag.bed.gz
