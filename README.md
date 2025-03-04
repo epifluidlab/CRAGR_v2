@@ -73,7 +73,7 @@ Our pipeline takes the following arguments in YAML format. A blank `params.yaml`
 - `r_path`: (REQUIRED) This is a path to your Rscript executable. You can usually find this with `which Rscript`.
 - `cragr_script`: (REQUIRED) This is a full path to the `CRAGR.r` script.
   - You can find this by running `system.file("extdata/scripts", "cragr.R", package = "cragr")` and pasting the full output OR
-  - Locate the source code directory and place the path to `int/ext/scripts/cragr.R`.
+  - Locate the source code directory and place the path to `inst/extdata/scripts/cragr.R`.
 - `samples`: (REQUIRED) This is a path to a  `.txt` file containing a list of paths (new-line separated) to the relevant sample fragment files.
   - These files must have a consistent naming structure that starts with an ID separated by a `.`. For example `{ID}.frag.bed.gz`
   - All of these fragment files must have an associated `tabix` index.
@@ -81,7 +81,7 @@ Our pipeline takes the following arguments in YAML format. A blank `params.yaml`
    - This file must be ordered, as this order determines the order of the sorting of the combined replicate fragment files.
 - `genome`: (REQUIRED, OPTIONS=['hg19', 'hg38']) This is the name of the genome build to use for the CRAG pipeline. 
 - `chrom_sizes`: (REQUIRED) This is the path to a file containing the chromosome sizes for the relevant `--genome`.
-  - See [inst/extdata/scripts/data/](https://github.com/epifluidlab/CRAGR_v2/tree/main/inst/extdata/scripts/idr_pipeline/data) for .chrom.sizes files for `hg19` and `hg38`.
+  - See [inst/extdata/scripts/data/](inst/extdata/scripts/idr_pipeline/data) for .chrom.sizes files for `hg19` and `hg38`.
 - `output_dir`: This is the path to a directory that all intermediate and output files will be stored in. 
    - If this directory does not exist, it will be created.
 
