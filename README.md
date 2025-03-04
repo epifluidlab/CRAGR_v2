@@ -40,7 +40,6 @@ pip install pulp==2.7.0
 
 # NOTE: For some HPC systems, libiconv.so may not be detected for the CRAGR installation process
 # You may have to manually add libiconv to the path in this case, like so:
-
 conda install conda-forge::libiconv
 export $LD_LIBRARY_PATH=<PATH TO CONDA LIBRARY FOLDER>
 ```
@@ -67,7 +66,7 @@ snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores {cores}
 
 ## Example Usage
 
-For your ease of use, we have prepared an example usage and `params.yaml` [here](`inst/extdata/scripts/data/example`). You may run the pipeline:
+For your ease of use, we have prepared an lightweight example usage [here](`inst/extdata/scripts/data/example`). You may run the pipeline:
 
 ```bash
 # Enter the example usage directory.
@@ -86,7 +85,7 @@ snakemake -s {path_to_idr_crag_smk} --configfile example_params.yaml --cores {co
 ## Parameters
 For a detailed understanding of the CRAG methods and analysis stages, we encourage you to read through our documentation here: [CRAGR](https://github.com/epifluidlab/cragr).
 
-Our pipeline takes the following arguments in YAML format. A blank `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
+Our pipeline takes arguments in YAML format. A blank `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
 
 ### Required Parameters
 - `r_path`: (REQUIRED) This is a path to your Rscript executable. You can usually find this with `which Rscript`.
