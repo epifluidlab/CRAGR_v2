@@ -67,7 +67,7 @@ snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores 16
 ## Parameters
 For a detailed understanding of the CRAG methods and analysis stages, we encourage you to read through our documentation here: [CRAGR](https://github.com/epifluidlab/cragr).
 
-Our pipeline takes the following arguments in YAML format. An example `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
+Our pipeline takes the following arguments in YAML format. A blank `params.yaml` is linked [here](inst/extdata/scripts/idr_pipeline/params.yaml), for your guidance.
 
 ### Required Parameters
 - `r_path`: (REQUIRED) This is a path to your Rscript executable. You can usually find this with `which Rscript`.
