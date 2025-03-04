@@ -93,9 +93,9 @@ Our pipeline takes the following arguments in YAML format. A blank `params.yaml`
 - `subsample`: (DEFAULT: 200M) This argument sets the number of fragments to subsample from the combined fragments to create the two replicate fragment files.
 - `exclude_regions`: (DEFAULT: None)  This is the path to a blacklist BED file, highlighting problematic areas of the genome to ignore.
   - You can learn more about the blacklist file purpose [here](https://www.nature.com/articles/s41598-019-45839-z).
-  - See [inst/extdata/scripts/data/](https://github.com/epifluidlab/CRAGR_v2/tree/main/inst/extdata/scripts/idr_pipeline/data) for .exclude.regions files for `hg19` and `hg38`.
+  - See [`inst/extdata/scripts/data/`](inst/extdata/scripts/idr_pipeline/data) for .exclude.regions files for `hg19` and `hg38`.
 - `high_mappability`: (DEFAULT: None)  This is a path to a file containing mappability scores in BED format. Restricts the analysis of the genome to high mappability regions.
-- See [inst/extdata/scripts/data/](https://github.com/epifluidlab/CRAGR_v2/tree/main/inst/extdata/scripts/idr_pipeline/data) for .high.mappability files for `hg19` and `hg38`.
+- See [`inst/extdata/scripts/data/`](inst/extdata/scripts/idr_pipeline/data) for .high.mappability files for `hg19` and `hg38`.
 - `gc_correct`: (DEFAULT: True)  This is a boolean parameter that determines whether or not to perform GC correction.
 - `gc_correct_method`: (DEFAULT: standard, OPTIONS=['standard', 'caret']) This determines the method used in the GC correction.
 - `gc_correct_N`: (DEFAULT: 1000000) This determines the maximal sample size for GC correction.
