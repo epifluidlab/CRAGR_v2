@@ -66,7 +66,7 @@ snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores {cores}
 
 ## Example Usage
 
-For your ease of use, we have prepared an lightweight example usage [here](`inst/extdata/scripts/data/example`). You may run the pipeline:
+For your ease of use, we have prepared an lightweight example usage [here](`inst/extdata/scripts/idr_pipeline/data/example`). You may run the pipeline:
 
 ```bash
 # Enter the example usage directory.
