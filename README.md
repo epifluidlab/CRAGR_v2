@@ -5,11 +5,12 @@
 
 - [1. Installation](#installation)
 - [2. Quick Start](#quick-start)
-- [3. Parameters](#parameters)
-- [4. Workflow Diagram](#workflow-diagram)
-- [5. Citation](#citation)
-- [6. Contact](#contact)
-- [7. License](#license)
+- [3. Example Usage](#example-usage)
+- [4. Parameters](#parameters)
+- [5. Workflow Diagram](#workflow-diagram)
+- [6. Citation](#citation)
+- [7. Contact](#contact)
+- [8. License](#license)
 
 ## Installation
 
@@ -61,8 +62,18 @@ system.file("extdata/scripts/idr_pipeline", "idr_cragr.smk", package = "cragr")
 
 3. (`bash`) Run the pipeline.
 ```bash
-snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores 16
+snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores {cores}
 ```
+
+## Example Usage
+
+For your ease of use, we have prepared an example usage and params [here](`inst/extdata/scripts/data/example`). You may run the pipeline:
+
+```bash
+cd ~/inst/extdata/scripts/data/example
+snakemake -s {path_to_idr_crag_smk} --configfile example_params.yaml --cores {cores}
+```
+
 
 ## Parameters
 For a detailed understanding of the CRAG methods and analysis stages, we encourage you to read through our documentation here: [CRAGR](https://github.com/epifluidlab/cragr).
