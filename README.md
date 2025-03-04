@@ -35,6 +35,7 @@ conda install bioconda::idr
 
 # For Snakemake:
 pip install snakemake==7.32.4
+pip install pulp==2.7.0
 
 # NOTE: For some HPC systems, libiconv.so may not be detected for the CRAGR installation process
 # You may have to manually add libiconv to the path in this case, like so:
@@ -70,16 +71,17 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
 
 ### Required Parameters
 - `r_path`: (REQUIRED) This is a path to your Rscript executable. You can usually find this with `which Rscript`.
-- `cragr_script`: (REQUIRED) This is a path to the `CRAGR.r` script.
-  - You can find this path by running `system.file("extdata/scripts", "cragr.R", package = "cragr")` OR
-  - Locate the source code directory and look at `int/ext/scripts/`.
-- `samples`: (REQUIRED) This is a path to a file containing the paths to the relevant sample fragment files.
-  - These files must start with an ID that is separated by a `.`. For example `{ID}.frag.bed.gz`
+- `cragr_script`: (REQUIRED) This is a full path to the `CRAGR.r` script.
+  - You can find this by running `system.file("extdata/scripts", "cragr.R", package = "cragr")` and pasting the full output OR
+  - Locate the source code directory and place the path to `int/ext/scripts/cragr.R`.
+- `samples`: (REQUIRED) This is a path to a  `.txt` file containing a list of paths (new-line separated) to the relevant sample fragment files.
+  - These files must have a consistent naming structure that starts with an ID separated by a `.`. For example `{ID}.frag.bed.gz`
   - All of these fragment files must have an associated `tabix` index.
-- `chroms`: (REQUIRED) This is a path to a file containing a list of chromosomes that hotspots and IFS scores should be retrieved for.
+- `chroms`: (REQUIRED) This is a path to a `.txt` file containing a list of chromosomes (new-line separated) that hotspots and IFS scores should be retrieved for.
    - This file must be ordered, as this order determines the order of the sorting of the combined replicate fragment files.
 - `genome`: (REQUIRED, OPTIONS=['hg19', 'hg38']) This is the name of the genome build to use for the CRAG pipeline. 
 - `chrom_sizes`: (REQUIRED) This is the path to a file containing the chromosome sizes for the relevant `--genome`.
+  - See [inst/extdata/scripts/data/](https://github.com/epifluidlab/CRAGR_v2/tree/main/inst/extdata/scripts/idr_pipeline/data) for .chrom.sizes files for `hg19` and `hg38`.
 - `output_dir`: This is the path to a directory that all intermediate and output files will be stored in. 
    - If this directory does not exist, it will be created.
 
@@ -88,10 +90,12 @@ Our pipeline takes the following arguments in YAML format. An example `params.ya
   - `fragment_count`: This will combine all of the fragment files and take `--subsample` fragments in each replicate with replacement. This inherently introduces overlaps to the replicates. To avoid very similar replicates, the total fragment count of all fragment files must be greater than `1.5*--subsample`.
   - `samples`: This will generate an equal split of the files into replicates. This ensures that the replicates have no data overlap.
 - `seed`: (DEFAULT: None) This is an integer that sets the seed of the random splitting of the replicates for reproducibility.
-- `subsample`: (DEFAULT: 200M) For a large number of samples, the combined replicate fragment file might be too large. This argument sets the number of fragments to subsample from the combined replicate for downstream analysis.
+- `subsample`: (DEFAULT: 200M) This argument sets the number of fragments to subsample from the combined fragments to create the two replicate fragment files.
 - `exclude_regions`: (DEFAULT: None)  This is the path to a blacklist BED file, highlighting problematic areas of the genome to ignore.
   - You can learn more about the blacklist file purpose [here](https://www.nature.com/articles/s41598-019-45839-z).
+  - See [inst/extdata/scripts/data/](https://github.com/epifluidlab/CRAGR_v2/tree/main/inst/extdata/scripts/idr_pipeline/data) for .exclude.regions files for `hg19` and `hg38`.
 - `high_mappability`: (DEFAULT: None)  This is a path to a file containing mappability scores in BED format. Restricts the analysis of the genome to high mappability regions.
+- See [inst/extdata/scripts/data/](https://github.com/epifluidlab/CRAGR_v2/tree/main/inst/extdata/scripts/idr_pipeline/data) for .high.mappability files for `hg19` and `hg38`.
 - `gc_correct`: (DEFAULT: True)  This is a boolean parameter that determines whether or not to perform GC correction.
 - `gc_correct_method`: (DEFAULT: standard, OPTIONS=['standard', 'caret']) This determines the method used in the GC correction.
 - `gc_correct_N`: (DEFAULT: 1000000) This determines the maximal sample size for GC correction.

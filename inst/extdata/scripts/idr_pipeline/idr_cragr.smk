@@ -42,8 +42,10 @@ elif genome == "hg38":
 
 chrom_sizes = config['chrom_sizes']
 output_dir = config['output_dir']
+if output_dir.endswith('/'):
+    output_dir = output_dir[:-1]
 os.makedirs(output_dir, exist_ok=True)
-os.makedirs(output_dir + "/sample_hotspots", exist_ok=True)
+os.makedirs(os.path.join(output_dir, "sample_hotspots"), exist_ok=True)
 
 # Optional arguments.
 split_method = config.get('split_method', 'fragment_count')
