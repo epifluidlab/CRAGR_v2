@@ -67,12 +67,20 @@ snakemake -s {path_to_idr_crag_smk} --configfile params.yaml --cores {cores}
 
 ## Example Usage
 
-For your ease of use, we have prepared an example usage and params [here](`inst/extdata/scripts/data/example`). You may run the pipeline:
+For your ease of use, we have prepared an example usage and `params.yaml` [here](`inst/extdata/scripts/data/example`). You may run the pipeline:
 
 ```bash
+# Enter the example usage directory.
 cd ~/inst/extdata/scripts/data/example
+
+# Modify the r_script parameter in example_params.yaml.
+
+# Run the pipeline.
 snakemake -s {path_to_idr_crag_smk} --configfile example_params.yaml --cores {cores}
 ```
+> [!NOTE]  
+> In order to remain lightweight, the sample fragment files are relatively low coverage. As a result, the pipeline will identify no peaks and fail at the IDR step (47%).
+
 
 
 ## Parameters
