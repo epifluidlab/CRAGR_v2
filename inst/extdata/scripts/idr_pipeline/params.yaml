@@ -10,7 +10,6 @@
 # seed:
 # subsample:
 # exclude_regions:
-# high_mappability:
 # gc_correct:
 # gc_correct_method:
 # gc_correct_N:
