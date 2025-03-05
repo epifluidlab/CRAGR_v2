@@ -75,6 +75,7 @@ step_size = config.get('step_size', 20)
 flank = (window_size - step_size) / 2
 total_fragment_min = config.get('total_fragment_min', 1.5*subsample)
 threads = config.get('threads', 1)
+n_cores = workflow.cores
 
 # Configure resource settings
 def get_resource_specs(rule_name):
@@ -220,7 +221,7 @@ rule combine_samples:
     output:
         rep1_output = output_dir + "/rep1.frag.sorted.gz",
         rep2_output = output_dir + "/rep2.frag.sorted.gz"
-    threads: threads
+    threads: n_cores
     resources:
         mem_mb=get_resource_specs('combine_samples')['mem_mb'],
         time=get_resource_specs('combine_samples')['time']
