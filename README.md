@@ -50,6 +50,8 @@ export $LD_LIBRARY_PATH=<PATH TO CONDA LIBRARY FOLDER>
 install.packages("devtools")
 devtools::install_github("epifluidlab/CRAGR_v2")
 ```
+> [!NOTE]  
+> CRAGR also requires BSgenome packages for the reference genome of interest, in order to perform GC correction. For hg19, install [this](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.1000genomes.hs37d5.html). For hg38 install [this](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.NCBI.GRCh38.html).
 
 ## Quick Start
 
