@@ -21,3 +21,4 @@ min_fraglen: 0
 max_fraglen: 500
 window_size: 200
 step_size: 20
+threads: 4

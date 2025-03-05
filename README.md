@@ -124,6 +124,7 @@ Our pipeline takes arguments in YAML format. A blank `params.yaml` is linked [he
 - `window_size`: (DEFAULT: 200) This is the sliding window size to use for the CRAG IFS calculation.
 - `step_size`: (DEFAULT: 20) The step size to use for the CRAG IFS calculation.
 - `total_fragment_min`  (DEFAULT: `1.5*--subsample`) This determines the minimum total fragments across your fragment files to allow the pipeline to run without throwing an error. Modify this threshold at your own risk.
+- `threads`: (DEFAULT:1) This specifies the number of threads to use for the individual steps of the pipeline (i.e. CRAGR ifs, CRAGR peak, CRAGR signal)
 
 ## Workflow Diagram
 

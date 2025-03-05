@@ -69,6 +69,37 @@ window_size = config.get('window_size', 200)
 step_size = config.get('step_size', 20)
 flank = (window_size - step_size) / 2
 total_fragment_min = config.get('total_fragment_min', 1.5*subsample)
+threads = config.get('threads', 1)
+
+# Configure resource settings
+def get_resource_specs(rule_name):
+    resource_specs = {
+        'default': {
+            'mem_mb': 4000,
+            'time': '2:00:00'
+        },
+        'combine_samples': {
+            'mem_mb': 16000,
+            'time': '2:00:00'
+        },
+        'run_ifs_per_chrom': {
+            'mem_mb': 2000,
+            'time': '2:00:00'
+        },
+        'run_peak': {
+            'mem_mb': 8000,
+            'time': '2:00:00'
+        },
+        'run_signal': {
+            'mem_mb': 8000,
+            'time': '2:00:00'
+        },
+        'idr': {
+            'mem_mb': 8000,
+            'time': '1:00:00'
+        }
+    }
+    return resource_specs.get(rule_name, resource_specs['default'])
 
 # Function to split the files into two replicates.
 def split_files_to_reps(list_of_filenames, split_method, seed=None):
@@ -83,7 +114,7 @@ def split_files_to_reps(list_of_filenames, split_method, seed=None):
     return rep1, rep2
 
 # Function to combine the files into merged replicate file.
-def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq):
+def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq, threads):
     if split_method == "fragment_count":
         if seed is not None:
             random.seed(seed)
@@ -117,12 +148,16 @@ def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_m
             for i, line in enumerate(in_f):
                 if i in selected_indices:
                     out_f.write(line)
-        sorted_output = temp_output + ".sorted"
-        print("Sorting the combined fragments with bedtools.")
-        with open(sorted_output, "w") as out_file:
-            subprocess.run(["bedtools", "sort", "-i", temp_output, "-g", chroms], stdout=out_file)
-        subprocess.run(["bgzip", "-f", sorted_output])
-        subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
+        sorted_output = temp_output + ".sorted.gz"
+        print("Sorting the combined fragments.")
+        sort_command = ["sort", "-V", "-k1,1", "-k2,2n", f"--parallel={threads}", temp_output]
+        bgzip_command = ["bgzip", "-c"]
+        with open(sorted_output, "wb") as out_file:
+            sort_process = subprocess.Popen(sort_command, stdout=subprocess.PIPE)
+            subprocess.run(bgzip_command, stdin=sort_process.stdout, stdout=out_file)
+        sort_process.wait()
+        subprocess.run(["tabix", "-pbed", sorted_output])
+
 
     else:
         temp_output = output_file.replace(".sorted.gz", "")
@@ -142,12 +177,15 @@ def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_m
                             if chrom in chroms_list and fraglen >= min_fraglen and fraglen <= max_fraglen and mapq >= min_mapq:
                                 out_f.write((line + '\n').encode('utf-8'))
                                 line_count += 1
-        sorted_output = temp_output + ".sorted"
-        print("Sorting the combined fragments with bedtools.")
-        with open(sorted_output, "w") as out_file:
-            subprocess.run(["bedtools", "sort", "-i", temp_output, "-g", chroms], stdout=out_file)
-        subprocess.run(["bgzip", "-f", sorted_output])
-        subprocess.run(["tabix", "-pbed", sorted_output + ".gz"])
+        sorted_output = temp_output + ".sorted.gz"
+        print("Sorting the combined fragments.")
+        sort_command = ["sort", "-V", "-k1,1", "-k2,2n", f"--parallel={threads}", temp_output]
+        bgzip_command = ["bgzip", "-c"]
+        with open(sorted_output, "wb") as out_file:
+            sort_process = subprocess.Popen(sort_command, stdout=subprocess.PIPE)
+            subprocess.run(bgzip_command, stdin=sort_process.stdout, stdout=out_file)
+        sort_process.wait()
+        subprocess.run(["tabix", "-pbed", sorted_output])
 
 rule all:
     input:
@@ -160,6 +198,9 @@ rule split_files:
     output:
         rep1 = output_dir + "/rep1_samples.txt",
         rep2 = output_dir + "/rep2_samples.txt"
+    resources:
+        mem_mb=get_resource_specs('default')['mem_mb'],
+        time=get_resource_specs('default')['time']
     run:
         rep1_samples, rep2_samples = split_files_to_reps(samples_list, split_method, seed=seed)
         with open(output.rep1, 'w') as f1, open(output.rep2, 'w') as f2:
@@ -174,11 +215,15 @@ rule combine_samples:
     output:
         rep1_output = output_dir + "/rep1.frag.sorted.gz",
         rep2_output = output_dir + "/rep2.frag.sorted.gz"
+    threads: threads
+    resources:
+        mem_mb=get_resource_specs('combine_samples')['mem_mb'],
+        time=get_resource_specs('combine_samples')['time']
     run:
         rep1_file_list = [line.strip() for line in open(input.rep1_samples)]
         rep2_file_list = [line.strip() for line in open(input.rep2_samples)]
-        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq)
-        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed+1, subsample, min_fraglen, max_fraglen, min_mapq)
+        combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq, threads)
+        combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed+1, subsample, min_fraglen, max_fraglen, min_mapq, threads)
 
 # Run the CRAGR IFS pipeline (Stage 1 Analysis).
 rule run_ifs_per_chrom:
@@ -197,6 +242,10 @@ rule run_ifs_per_chrom:
         min_mapq_param = f"--min-mapq={min_mapq}",
         min_fraglen_param = f"--min-fraglen={min_fraglen}",
         max_fraglen_param = f"--max-fraglen={max_fraglen}"
+    threads: threads
+    resources:
+        mem_mb=get_resource_specs('run_ifs_per_chrom')['mem_mb'],
+        time=get_resource_specs('run_ifs_per_chrom')['time']
     shell:
         """
         {r_path} {cragr_script} ifs \
@@ -213,7 +262,8 @@ rule run_ifs_per_chrom:
         {params.step_size_param} \
         {params.min_mapq_param} \
         {params.min_fraglen_param} \
-        {params.max_fraglen_param}
+        {params.max_fraglen_param} \
+        -t {threads}
         """
 
 rule concat_chrom_results:
@@ -221,6 +271,10 @@ rule concat_chrom_results:
         chrom_files = expand(output_dir + "/rep{{rep}}.{chrom}.rawifs.bed.gz", chrom=chroms_list)
     output:
         final_output = output_dir + "/rep{rep}.rawifs.bed.gz"
+    threads: 1
+    resources:
+        mem_mb=get_resource_specs('default')['mem_mb'],
+        time=get_resource_specs('default')['time']
     run:
         temp_output = output.final_output.replace('.gz', '')
         with open(temp_output, 'w') as out_f:
@@ -242,6 +296,10 @@ rule run_peak:
         frag_file = output_dir + "/rep{rep}.rawifs.bed.gz"
     output:
         ifs_output = output_dir + "/rep{rep}.ifs.bedGraph.gz"
+    threads: threads
+    resources:
+        mem_mb=get_resource_specs('run_peak')['mem_mb'],
+        time=get_resource_specs('run_peak')['time']
     params:
         gc_correct_flag = "--gc-correct" if gc_correct else "",
         gc_correct_method_param = f"--gc-correct-method={gc_correct_method}",
@@ -261,6 +319,7 @@ rule run_peak:
         {params.gc_correct_n_param} \
         {params.window_size_param} \
         {params.step_size_param} \
+        -t {threads}
         """
 
 # Run the IDR analysis.
@@ -269,6 +328,10 @@ rule idr_preprocess:
         ifs_file = output_dir + "/rep{rep}.ifs.bedGraph.gz",
     output:
         peak_format = output_dir + "/rep{rep}.hotspot.narrowpeak",
+    threads: 1
+    resources:
+        mem_mb=get_resource_specs('default')['mem_mb'],
+        time=get_resource_specs('default')['time']
     shell:
         """
         zcat {input.ifs_file} | \
@@ -291,6 +354,10 @@ rule idr:
         rep2 = output_dir + "/rep2.hotspot.narrowpeak"
     output:
         idr_output = output_dir + "/hotspot.idr",
+    threads: 1 
+    resources:
+        mem_mb=get_resource_specs('idr')['mem_mb'],
+        time=get_resource_specs('idr')['time']
     shell:
         """
         idr --samples {input.rep1} {input.rep2} \
@@ -308,6 +375,10 @@ rule filter_idr:
         idr_file = output_dir + "/hotspot.idr"
     output:
         idr_filtered = output_dir + "/hotspot.idr.filtered.bed.gz"
+    threads: 1
+    resources:
+        mem_mb=get_resource_specs('default')['mem_mb'],
+        time=get_resource_specs('default')['time']
     shell:
         """
         awk '$8<={idr_threshold}' {input.idr_file} | \
@@ -334,6 +405,10 @@ rule run_signal:
         min_mapq_param = f"--min-mapq={min_mapq}",
         min_fraglen_param = f"--min-fraglen={min_fraglen}",
         max_fraglen_param = f"--max-fraglen={max_fraglen}"
+    threads: threads
+    resources:
+        mem_mb=get_resource_specs('run_signal')['mem_mb'],
+        time=get_resource_specs('run_signal')['time']
     shell:
         """
         {r_path} {cragr_script} signal \
@@ -350,7 +425,8 @@ rule run_signal:
         {params.window_size_param} \
         {params.min_mapq_param} \
         {params.min_fraglen_param} \
-        {params.max_fraglen_param}
+        {params.max_fraglen_param} \
+        -t {threads}
         """
 
 # Combine the signal files into a single file.
@@ -376,6 +452,10 @@ rule combine_signal:
         signal_files = expand(output_dir + "/sample_hotspots/{sample}.signal.bedGraph.gz", sample=ids_list)
     output:
         combined_signal = output_dir + "/sample_hotspots/combined.signal.bedGraph.gz"
+    threads: 1
+    resources:
+        mem_mb=16000,
+        time='2:00:00'
     run:
         combine_samples(input.signal_files, output_dir)
 
@@ -385,6 +465,10 @@ rule cleanup:
         output_dir + "/sample_hotspots/combined.signal.bedGraph.gz"
     output:
         output_dir + "/cleanup.done"
+    threads: 1
+    resources:
+        mem_mb=2000,
+        time='0:30:00'
     shell:
         """
         # Remove intermediate files from rep1 and rep2
