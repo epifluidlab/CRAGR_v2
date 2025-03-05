@@ -9,6 +9,7 @@
 # split_method:
 # seed:
 # subsample:
+# hotspot_samples:
 # exclude_regions:
 # gc_correct:
 # gc_correct_method:

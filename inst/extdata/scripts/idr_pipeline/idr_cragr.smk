@@ -25,7 +25,12 @@ r_path = config['r_path']
 cragr_script = config['cragr_script']
 samples = config['samples']
 samples_list = [line.strip() for line in open(samples)]
-ids_list = [format_sample(sample) for sample in samples_list]
+hotspot_samples = config.get('hotspot_samples', None)
+if hotspot_samples is not None:
+    hotspot_samples_list = [line.strip() for line in open(hotspot_samples)]
+    ids_list = [format_sample(sample) for sample in hotspot_samples_list]
+else:
+    ids_list = [format_sample(sample) for sample in samples_list]
 basenames = [get_basename(sample) for sample in samples_list]
 if len(set(basenames)) != 1:
     raise ValueError("The format {ID}.{BASENAME} has varied basenames in the fragment file input.")
