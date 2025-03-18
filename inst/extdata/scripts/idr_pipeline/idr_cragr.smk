@@ -157,12 +157,12 @@ def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_m
         sorted_output = temp_output + ".sorted.gz"
         print("Sorting the combined fragments.")
         sort_command = ["sort", "-V", "-k1,1", "-k2,2n", f"--parallel={threads}", temp_output]
-        bgzip_command = ["bgzip", "-c"]
+        bgzip_command = ["bgzip", "-c", "-@", f"{threads}"]
         with open(sorted_output, "wb") as out_file:
             sort_process = subprocess.Popen(sort_command, stdout=subprocess.PIPE)
             subprocess.run(bgzip_command, stdin=sort_process.stdout, stdout=out_file)
         sort_process.wait()
-        subprocess.run(["tabix", "-pbed", sorted_output])
+        subprocess.run(["tabix", "-pbed", "-@", f"{threads}", sorted_output])
 
 
     else:
@@ -186,12 +186,12 @@ def combine_samples_to_reps(file_list, output_file, chroms, chroms_list, split_m
         sorted_output = temp_output + ".sorted.gz"
         print("Sorting the combined fragments.")
         sort_command = ["sort", "-V", "-k1,1", "-k2,2n", f"--parallel={threads}", temp_output]
-        bgzip_command = ["bgzip", "-c"]
+        bgzip_command = ["bgzip", "-c", "-@", f"{threads}"]
         with open(sorted_output, "wb") as out_file:
             sort_process = subprocess.Popen(sort_command, stdout=subprocess.PIPE)
             subprocess.run(bgzip_command, stdin=sort_process.stdout, stdout=out_file)
         sort_process.wait()
-        subprocess.run(["tabix", "-pbed", sorted_output])
+        subprocess.run(["tabix", "-pbed", "-@", f"{threads}", sorted_output])
 
 rule all:
     input:
@@ -228,6 +228,7 @@ rule combine_samples:
     run:
         rep1_file_list = [line.strip() for line in open(input.rep1_samples)]
         rep2_file_list = [line.strip() for line in open(input.rep2_samples)]
+        print("Combining samples into replicate 1 and replicate 2. Using threads: ", threads)
         combine_samples_to_reps(rep1_file_list, output.rep1_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed, subsample, min_fraglen, max_fraglen, min_mapq, threads)
         combine_samples_to_reps(rep2_file_list, output.rep2_output, chroms, chroms_list, split_method, samples_list, total_fragment_min, seed+1, subsample, min_fraglen, max_fraglen, min_mapq, threads)
 
